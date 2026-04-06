@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; color: #333; }
+        .container { max-width: 900px; margin: 0 auto; background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #007bff; }
+        .user-list { margin-bottom: 30px; }
+        .user-item { background-color: #e9ecef; padding: 10px 15px; border-radius: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .user-item span { flex-grow: 1; margin-right: 15px; }
+        .user-item .actions button { background-color: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; margin-left: 5px; }
+        .user-item .actions button.reject { background-color: #dc3545; }
+        .user-item .actions button:hover { opacity: 0.9; }
+        .no-users { color: #6c757d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Admin Dashboard</h1>
+
+        <div class="user-list">
+            <h2>Pending Applications</h2>
+            {% if pending_users %}
+                {% for user in pending_users %}
+                    <div class="user-item">
+                        <span>Username: {{ user.username }} ({{ user.email }})</span>
+                        <div class="actions">
+                            <form action="{{ url_for('admin_approve_user', user_id=user.id) }}" method="post" style="display:inline;">
+                                <button type="submit">Approve</button>
+                            </form>
+                            <form action="{{ url_for('admin_reject_user', user_id=user.id) }}" method="post" style="display:inline;">
+                                <button type="submit" class="reject">Reject</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="no-users">No pending applications.</p>
+            {% endif %}
+        </div>
+
+        <div class="user-list">
+            <h2>Approved Users</h2>
+            {% if approved_users %}
+                {% for user in approved_users %}
+                    <div class="user-item">
+                        <span>Username: {{ user.username }} ({{ user.email }})</span>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="no-users">No approved users.</p>
+            {% endif %}
+        </div>
+
+        <div class="user-list">
+            <h2>Rejected Users</h2>
+            {% if rejected_users %}
+                {% for user in rejected_users %}
+                    <div class="user-item">
+                        <span>Username: {{ user.username }} ({{ user.email }})</span>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="no-users">No rejected users.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

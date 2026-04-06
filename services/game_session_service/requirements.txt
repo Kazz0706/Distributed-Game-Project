@@ -1,0 +1,3 @@
+# game_session_service/requirements.txt
+# WebSocket通信のためのライブラリ
+websockets==12.0

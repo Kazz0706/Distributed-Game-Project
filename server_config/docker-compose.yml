@@ -1,0 +1,92 @@
+# version: '3.8'
+
+services:
+  # データベースコンテナ (S2上での実行を想定)
+  db:
+    image: postgres:15-alpine
+    container_name: game_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - ./data_service/db_schema.sql:/docker-entrypoint-initdb.d/init.sql # スキーマ適用
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - game-network
+
+  # データサービスコンテナ (S2上で動作するAPI)
+  data_service:
+    build:
+      context: ../services/data_service
+      dockerfile: Dockerfile
+    container_name: data_service
+    environment:
+      DB_HOST: db # DBコンテナ名
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+    ports:
+      - "5001:5001" # S2の5001ポート
+    depends_on:
+      - db
+    networks:
+      - game-network
+
+  # 認証・マッチングサービスコンテナ (S1上で動作)
+  auth_match_service:
+    build:
+      context: ../services/auth_match_service
+      dockerfile: Dockerfile
+    container_name: auth_match_service
+    # depends_on に data_service がいることを再確認
+    # DBが起動するまで待つスクリプトをCMDとして実行（entrypoint.shが必要）
+    # entrypoint: ["/bin/sh", "-c", "python wait_for_db.py && flask run --host=0.0.0.0 --port=5000"]
+    # S1のLB機能を兼ねるため、外部アクセスポートを開放
+    ports:
+      - "8080:5000" # 8080ポートを使用
+    environment:
+      DATA_SERVICE_URL: http://data_service:5001  # S2のデータサービスURL
+    depends_on:
+      - data_service # data_serviceが起動してからauth_match_serviceを起動
+    networks:
+      - game-network
+
+  # ゲームセッションサービス1 (S1上で動作)
+  game_session_s1:
+    build:
+      context: ../services/game_session_service
+      dockerfile: Dockerfile
+    container_name: game_session_s1
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8081
+    ports:
+      - "8081:8081" # S1の8081ポート
+    networks:
+      - game-network
+      
+  # ゲームセッションサービス2 (S2上で動作)
+  game_session_s2:
+    build:
+      context: ../services/game_session_service
+      dockerfile: Dockerfile
+    container_name: game_session_s2
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8082
+    ports:
+      - "8082:8081" # S2の8081ポートをホストの8082にマッピング（S2の役割をシミュレート）
+    networks:
+      - game-network
+
+volumes:
+  db_data:
+
+networks:
+  game-network:
+    driver: bridge
+
+# 注意: 実際のS1/S2のIPアドレスのシミュレーションとして、ホスト側のポートを`8081`と`8082`に分けています。また、DBとデータサービスは**論理的にS2上**にありますが、Docker Composeネットワークで同じネットワーク（`game-network`）に配置します。
+# 各サービスディレクトリ内に、アプリケーションをコンテナ化するための `Dockerfile` が必要です。

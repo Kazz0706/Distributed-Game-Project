@@ -1,0 +1,50 @@
+services:
+  nginx_s2:
+    image: nginx:latest
+    container_name: nginx_s2
+    ports:
+      - "80:80"   # 管理者用Webサイト (例: http://<SERVER2_IP>/admin) # ホストの80番ポートをコンテナの80番ポートにマッピング
+      - "5001:80" # サーバー1のauth_match_serviceからのアクセス用 (例: http://<SERVER2_IP>:5001/approval/apply)
+                  # ここではS1からのアクセスを別のポートで受け付けるようにしています。
+                  # 80ポートをそのまま使うことも可能ですが、衝突を避けるために別ポートにしています。
+    volumes:
+      - ./S2_nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - approval_service
+    networks:
+      - approval_network
+
+  approval_service:
+    build: ../services/approval_service
+    container_name: approval_service
+    environment:
+      POSTGRES_USER: approval_user
+      POSTGRES_PASSWORD: approval_password
+      POSTGRES_DB: approval_db
+      POSTGRES_HOST: approval_db_postgres # サービス名
+      SECRET_KEY: "super_secret_key_for_session" # 本番環境ではより強力なランダムなキーに
+      ADMIN_USERNAME: "yoshida"
+      ADMIN_PASSWORD: "check_users"
+    depends_on:
+      - approval_db_postgres
+    networks:
+      - approval_network
+
+  approval_db_postgres:
+    image: postgres:13-alpine
+    container_name: approval_db_postgres
+    environment:
+      POSTGRES_USER: approval_user
+      POSTGRES_PASSWORD: approval_password
+      POSTGRES_DB: approval_db
+    volumes:
+      - approval_db_data:/var/lib/postgresql/data
+    networks:
+      - approval_network
+
+volumes:
+  approval_db_data: # 永続化のためのボリューム
+
+networks:
+  approval_network:
+    driver: bridge

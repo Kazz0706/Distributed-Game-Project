@@ -1,0 +1,78 @@
+services:
+  nginx_s1:
+    image: nginx:latest
+    container_name: nginx_s1
+    ports:
+      - "8000:80" # クライアントからのリクエストを受け付けるポート
+    volumes:
+      - ./S1_nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../client:/usr/share/nginx/html:ro # <-- NEW: クライアントファイルをNginxにマウント
+    depends_on:
+      - auth_match_service
+      - game_session_service
+    networks:
+      - game_network
+
+  auth_match_service:
+    build: ../services/auth_match_service
+    container_name: auth_match_service
+    environment:
+      # approval_serviceへの接続は、後でS2のIPアドレスを直接指定するか、
+      # Dockerのoverlay networkを使う必要があります。
+      # ここでは仮にホスト名を指定しておきますが、後で修正が必要です。
+      # または、後述するnginxを介したルーティングも考えられます。
+      # 現時点では、approval_serviceは別のDocker Composeで動くため、直接は名前解決できません。
+      # S2のIPアドレスを明示的に指定する場合:
+      # APPROVAL_SERVICE_URL: "http://<SERVER2_IP_ADDRESS>:5001"
+      # (SERVER2_IP_ADDRESS は実際のS2のIPアドレスに置き換える)
+      # 今回はS2のNginxを介してアクセスすることを想定します。
+      # APPROVAL_SERVICE_URL: "http://nginx_s2:80/approval" # S2のNginxを介したアクセス
+      APPROVAL_SERVICE_URL: "http://192.168.200.103:5001/approval"
+
+    # auth_match_serviceがrequestsライブラリを使用するため、必要
+    # 実際には、S2のNginxのIPアドレスまたはホスト名に解決できる必要があります。
+    # Extra Hostsを使用して、S2のNginxのIPアドレスを名前解決させる方法:
+    # extra_hosts:
+    #   - "nginx_s2:192.168.200.102" # ここにS2の実際のIPアドレスを記述
+    networks:
+      - game_network
+
+  game_session_service:
+    build: ../services/game_session_service
+    container_name: game_session_service
+    networks:
+      - game_network
+
+  # data_service (既存)
+  data_service:
+    build: ../services/data_service
+    container_name: data_service
+    environment:
+      POSTGRES_USER: game_user
+      POSTGRES_PASSWORD: game_password
+      POSTGRES_DB: game_db
+      POSTGRES_HOST: game_db_postgres # サービス名
+    networks:
+      - game_network
+
+  game_db_postgres:
+    image: postgres:13-alpine
+    container_name: game_db_postgres
+    environment:
+      POSTGRES_USER: game_user
+      POSTGRES_PASSWORD: game_password
+      POSTGRES_DB: game_db
+    ports:
+      - "5432:5432" # ホストの5432ポートをコンテナの5432ポートにマッピング
+    volumes:
+      - ./db_data/game_db_data:/var/lib/postgresql/data
+      - ./db_init_scripts:/docker-entrypoint-initdb.d # ディレクトリをマウント
+    networks:
+      - game_network
+
+volumes:
+  game_db_data: # 永続化のためのボリューム
+
+networks:
+  game_network:
+    driver: bridge

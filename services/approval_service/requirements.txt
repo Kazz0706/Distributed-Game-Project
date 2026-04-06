@@ -1,0 +1,5 @@
+Flask
+requests
+Flask-SQLAlchemy
+gunicorn
+psycopg2-binary # データベース接続用

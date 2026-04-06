@@ -1,0 +1,227 @@
+/* style.css */
+
+/* --- 基本設定 --- */
+body {
+    font-family: 'Press Start 2P', cursive, sans-serif; /* ピクセルフォントを優先 */
+    margin: 0;
+    padding: 0;
+    background-color: #1a1a2e; /* 暗い背景色 */
+    color: #e0e0e0; /* 明るい文字色 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    /* overflow: hidden; /*スクロールバーを非表示に */
+}
+
+/* --- 汎用ユーティリティ --- */
+.hidden {
+    display: none !important; /* 重要: 非表示を強制 */
+}
+
+/* --- 認証セクション (よくある認証ページのデザイン) --- */
+#authSection {
+    background-color: #2e2e4a; /* 背景色 */
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* 影 */
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    margin: 20px auto;
+}
+
+#authSection h1 {
+    color: #00bcd4; /* アクセントカラー */
+    margin-bottom: 10px;
+    font-size: 2.2em;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+}
+
+#authSection p {
+    color: #b0b0d0;
+    margin-bottom: 25px;
+    font-size: 0.9em;
+}
+
+#authSection h2 {
+    color: #a0a0ff; /* やや明るい色 */
+    margin-top: 30px;
+    margin-bottom: 15px;
+    font-size: 1.5em;
+    border-bottom: 1px solid rgba(160, 160, 255, 0.3);
+    padding-bottom: 5px;
+}
+
+#authSection form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* 要素間のスペース */
+    margin-bottom: 20px;
+}
+
+#authSection input[type="text"],
+#authSection input[type="password"],
+#authSection input[type="email"] {
+    padding: 12px 15px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #3e3e60;
+    color: #e0e0e0;
+    font-size: 1em;
+    width: 100%;
+    box-sizing: border-box; /* paddingを含めて幅を計算 */
+}
+
+#authSection input[type="text"]::placeholder,
+#authSection input[type="password"]::placeholder,
+#authSection input[type="email"]::placeholder {
+    color: #888;
+}
+
+#authSection button[type="submit"] {
+    padding: 12px 25px;
+    background-color: #00bcd4;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    align-self: flex-end; /* ボタンを右寄せ */
+}
+
+#authSection button[type="submit"]:hover {
+    background-color: #00a8be;
+}
+
+#authMessage {
+    color: #ffeb3b; /* 警告や情報の色 */
+    margin-top: 15px;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+
+/* --- メインコンテンツ (ゲームらしいデザイン) --- */
+#mainContent {
+    background-color: #222; /* より暗い背景 */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+    text-align: center;
+    max-width: 800px;
+    width: 95%;
+    /* 初期は hidden クラスで非表示 */
+}
+
+#mainContent h1 {
+    color: #ff4081; /* ゲームのメインカラー */
+    font-size: 2.5em;
+    margin-bottom: 30px;
+    text-shadow: 3px 3px 7px rgba(0, 0, 0, 0.8);
+}
+
+/* --- マッチングセクション --- */
+#match-section {
+    background-color: #333;
+    padding: 25px;
+    border-radius: 6px;
+    margin-bottom: 30px;
+    border: 2px solid #ff4081;
+}
+
+#match-section h2 {
+    color: #ff4081;
+    font-size: 1.8em;
+    margin-bottom: 20px;
+}
+
+#match-section label {
+    display: inline-block;
+    margin: 0 15px 15px 0;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+#match-section input[type="radio"] {
+    margin-right: 8px;
+    transform: scale(1.2); /* ラジオボタンを少し大きく */
+}
+
+#match-button, #cancel-button {
+    padding: 12px 30px;
+    margin: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+#match-button {
+    background-color: #00c853; /* マッチング開始は緑 */
+    color: white;
+}
+#match-button:hover {
+    background-color: #00b04c;
+    transform: scale(1.02);
+}
+
+#cancel-button {
+    background-color: #d50000; /* キャンセルは赤 */
+    color: white;
+}
+#cancel-button:hover {
+    background-color: #b70000;
+    transform: scale(1.02);
+}
+
+#match-message {
+    color: #ffff00; /* 警告的な黄色 */
+    margin-top: 20px;
+    font-weight: bold;
+    font-size: 1em;
+}
+
+/* --- ゲーム画面セクション --- */
+#game-section {
+    /* background-color: #000; /* ゲーム画面の背景は真っ黒 */
+    background-color: #8B0000; /* ★★★ 修正: ゲーム画面の背景を濃い赤色（Dark Red）に変更 ★★★ */
+    padding: 20px;
+    border-radius: 6px;
+    border: 2px solid #00bcd4; /* アクセントカラーのボーダー */
+}
+
+#game-section h2 {
+    color: #00bcd4;
+    font-size: 1.8em;
+    margin-bottom: 15px;
+}
+
+#game-screen {
+    /* background-color: #111; /* Canvasの背景色 */
+    background-color: #FF6347; /* ★★★ 明るい赤色（Tomato） ★★★ */
+    border: 3px solid #666;
+    display: block; /* 中央寄せのためにブロック要素に */
+    margin: 0 auto; /* 中央寄せ */
+}
+
+/* --- フォントの読み込み (オプション) --- */
+/* Google Fontsからピクセルフォントを読み込む例 */
+/* @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap'); */
+
+/* --- レスポンシブデザインの基本的な対応 --- */
+@media (max-width: 768px) {
+    #authSection, #mainContent {
+        padding: 20px;
+        margin: 10px;
+    }
+    #authSection h1, #mainContent h1 {
+        font-size: 1.8em;
+    }
+    #authSection input, #authSection button, #match-button, #cancel-button {
+        font-size: 0.9em;
+        padding: 10px 15px;
+    }
+}

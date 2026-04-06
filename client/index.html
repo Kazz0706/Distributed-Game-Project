@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Distributed Fighting Game Client</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- <style>
+        /* スタイルは簡略化 */
+        body { font-family: sans-serif; margin: 20px; }
+        #game-screen { background-color: #eee; border: 1px solid black; width: 640px; height: 480px; margin-top: 20px; }
+        .hidden { display: none !important; } /* !important を付けて強制的に非表示にする */
+
+        /* レイアウトの調整 */
+        /* #mainContent の display: none; は .hidden クラスで制御するので削除 */
+        /* #mainContent { } */ /* このCSSブロックは不要になるか、別のスタイルを定義する */
+    </style> -->
+</head>
+<body>
+
+    <div id="authSection">
+        <h1>Welcome to Distributed Fighting Game</h1>
+        <p>Please register or log in to play.</p>
+
+        <h2>Register</h2>
+        <form id="registerForm">
+            <input type="text" id="registerUsername" placeholder="Username" required><br>
+            <input type="password" id="registerPassword" placeholder="Password" required><br>
+            <input type="email" id="registerEmail" placeholder="Email" required><br>
+            <button type="submit">Register</button>
+        </form>
+
+        <h2>Login</h2>
+        <form id="loginForm">
+            <input type="text" id="loginUsername" placeholder="Username" required><br>
+            <input type="password" id="loginPassword" placeholder="Password" required><br>
+            <button type="submit">Login</button>
+        </form>
+        <p id="authMessage"></p> <!-- 認証メッセージ表示用 -->
+    </div>
+
+    <!-- ログイン成功後に表示するメインコンテンツ -->
+    <!-- 初期は hidden クラスで非表示にする -->
+    <div id="mainContent" class="hidden">
+        <h1>分散格闘ゲーム</h1>
+
+        <!-- 2. マッチング画面 -->
+        <div id="match-section"> <!-- 初期は隠れているが、ログイン後に表示される -->
+            <h2>対戦モード選択</h2>
+            <label>
+                <input type="radio" name="mode" value="ffa_2p" checked> 2人対戦 (FFA)
+            </label>
+            <label>
+                <input type="radio" name="mode" value="ffa_3p"> 3人対戦 (FFA)
+            </label>
+            <label>
+                <input type="radio" name="mode" value="ffa_4p"> 4人対戦 (FFA)
+            </label>
+            <label>
+                <input type="radio" name="mode" value="cpu"> CPU対戦
+            </label>
+            <br>
+            <button id="match-button">マッチング開始</button>
+            <p id="match-message">待機中...</p>
+            <button id="cancel-button" class="hidden">キャンセル</button>
+        </div>
+
+        <!-- 3. ゲーム画面 -->
+        <div id="game-section" class="hidden">
+            <h2>ゲーム中</h2>
+            <canvas id="game-screen" width="640" height="480"></canvas>
+        </div>
+    </div>
+
+    <script src="game_client.js"></script>
+
+</body>
+</html>

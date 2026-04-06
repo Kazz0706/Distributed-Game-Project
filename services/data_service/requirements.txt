@@ -1,0 +1,4 @@
+# data_service/requirements.txt
+Flask==2.3.3
+psycopg2-binary==2.9.9  # PostgreSQLの場合
+# または、使用するDBに合わせたライブラリ (例: mysqlclient)
