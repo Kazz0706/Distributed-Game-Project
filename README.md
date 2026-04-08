@@ -1,4 +1,3 @@
-```markdown
 # Distributed Fighting Game Project
 
 マイクロサービスアーキテクチャを採用した、ブラウザベースの分散型オンライン対戦格闘ゲームです。
@@ -32,7 +31,6 @@ distributed_game_project
     ├── auth_match_service    # 認証・マッチングロジック (S1)
     ├── data_service          # DBアクセス一元管理
     └── game_session_service  # リアルタイムゲームロジック (S1)
-```
 
 ### 🔄 System Flow (ゲーム開始までのフロー)
 
