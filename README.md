@@ -64,18 +64,18 @@ sequenceDiagram
 
 ### 1. 承認サービス (`approval_service`)
 新規ユーザーの申請（pending）を受け付け、管理者が手動で承認（approved）または却下（rejected）するWebインターフェースを提供します。
-* ![ユーザー申請画面](images/application.jpg)
-* ![管理者画面](images/admin.jpg)
+* ![ユーザー申請画面](images/application.JPEG)
+* ![管理者画面](images/admin.JPEG)
 
 ### 2. 認証・マッチングサービス (`auth_match_service`)
 ユーザーの本人確認を行い、対戦モード（例: 2人対戦 `ffa_2p`）に基づいたマッチングキューを管理します。マッチング成立後、最も負荷の低いゲームセッションサーバーのエンドポイントをクライアントに割り当てます。
-* ![ログイン・マッチング画面](images/login.jpg)
+* ![ログイン・マッチング画面](images/matching.JPEG)
 
 ### 3. ゲームセッションサービス (`game_session_service`)
 WebSocketを介してクライアントと接続し、格闘ゲームのコアロジックを実行します。
 * **操作:** 走る(←, →)、ジャンプ(Space)、上攻撃(x)、下攻撃(s)、横攻撃(x)、必殺技(c: ゲージ100で発動可能)
 * **ロジック:** 衝突判定、HP管理（初期値500）、攻撃ヒット時の反発、画面外落下時のジャンプ復帰ロジック。
-* ![ゲームプレイ画面](images/game.jpg)
+* ![ゲームプレイ画面](images/game.JPEG)
 
 ### 4. データサービス (`data_service` / PostgreSQL)
 全サービスが依存するデータを管理します。
@@ -169,18 +169,18 @@ sequenceDiagram
 
 ### 1. Approval Service (`approval_service`)
 Accepts new user applications (`pending`) and provides a web interface for administrators to manually approve (`approved`) or reject (`rejected`) them.
-* ![User Application Screen](images/application.jpg)
-* ![Admin Dashboard](images/admin.jpg)
+* ![User Application Screen](images/application.JPEG)
+* ![Admin Dashboard](images/admin.JPEG)
 
 ### 2. Auth & Match Service (`auth_match_service`)
 Authenticates users and manages matchmaking queues based on the selected mode (e.g., 2-player `ffa_2p`). Once a match is successfully formed, it assigns the endpoint of the game session server with the lowest load to the clients.
-* ![Login & Matchmaking Screen](images/login.jpg)
+* ![Login & Matchmaking Screen](images/matching.JPEG)
 
 ### 3. Game Session Service (`game_session_service`)
 Establishes a WebSocket connection with clients to execute the core fighting game logic.
 * **Controls:** Run (Left/Right Arrows), Jump (Space), Up Attack (X), Down Attack (S), Side Attack (X), Ultimate Skill (C: usable when gauge reaches 100).
 * **Game Logic:** Collision detection, HP management (initial HP 500), knockback upon hit, and a recovery jump mechanism when falling off the stage.
-* ![Game Play Screen](images/game.jpg)
+* ![Game Play Screen](images/game.JPEG)
 
 ### 4. Data Service (`data_service` / PostgreSQL)
 Manages the centralized database relied upon by all microservices.
