@@ -12,7 +12,12 @@
 
 ## 🏗 System Architecture (システム構成)
 
-本システムは、3つの論理的な層（クライアント、設定、サービス）と7つのDockerコンテナで構成されています。
+本システムは、リアルタイム性を追求する「フロントエンド・ノード(S1)」と、一貫性を管理する「データ・ノード(S2)」に役割を分離した**機能分散型アーキテクチャ**を採用しています。
+
+*   **Server 1 (S1): リアルタイム・フロントエンド**
+    *   Nginxを窓口（リバースプロキシ）とし、ユーザーの認証、マッチング、およびWebSocketによる低遅延なゲームセッションを制御します。
+*   **Server 2 (S2): バックエンド・データ集約**
+    *   PostgreSQLデータベースとデータ管理APIをホスト。全コンテナからの戦績やユーザー情報の読み書きを一元管理し、データの一貫性を保証します。また、管理者による新規ユーザーの承認フローもここで管理されます。
 
 ### 📁 Directory Structure
 ```text
@@ -124,7 +129,12 @@ To overcome the scalability, availability, and flexibility challenges of traditi
 
 ## 🏗 System Architecture
 
-The system is composed of 3 logical layers (Client, Configuration, and Service) operating across 7 Docker containers.
+The system employs a **functionally distributed architecture**, separating the "Real-time Frontend Node (S1)" from the "Data Consistency Node (S2)."
+
+*   **Server 1 (S1): Real-time Frontend**
+    *   Acts as the primary entry point via Nginx (Reverse Proxy). It handles user authentication, matchmaking, and manages low-latency game sessions via WebSockets.
+*   **Server 2 (S2): Backend & Data Aggregation**
+    *   Hosts the PostgreSQL database and the central Data API. It ensures data consistency by centralizing all read/write operations for user profiles and match results. It also hosts the Admin Approval UI for new registrations.
 
 ### 📁 Directory Structure
 ```text
