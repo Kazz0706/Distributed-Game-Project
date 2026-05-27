@@ -19,6 +19,66 @@
 *   **Server 2 (S2): バックエンド・データ集約**
     *   PostgreSQLデータベースとデータ管理APIをホスト。全コンテナからの戦績やユーザー情報の読み書きを一元管理し、データの一貫性を保証します。また、管理者による新規ユーザーの承認フローもここで管理されます。
 
+## 🌐 分散システム・アーキテクチャ全体図
+
+```mermaid
+flowchart TD
+    %% --- スタイル定義 (視認性最大化) ---
+    classDef s1_style fill:#e6f7ff,stroke:#1890ff,stroke-width:4px,font-size:22px,font-weight:bold;
+    classDef s2_style fill:#fff1f0,stroke:#f5222d,stroke-width:4px,font-size:22px,font-weight:bold;
+    classDef storage fill:#f6ffed,stroke:#52c41a,stroke-width:4px,font-size:22px,font-weight:bold;
+    classDef client_style fill:#ffffff,stroke:#333333,stroke-width:3px,font-size:22px,font-weight:bold;
+
+    %% --- 1. クライアント層 ---
+    USER["👤 一般ユーザー<br/>(Browser)"]:::client_style
+    ADMIN["🔑 管理者<br/>(Admin Console)"]:::client_style
+
+    %% --- 2. SERVER 1 (192.168.200.102) ---
+    subgraph S1 ["🚀 SERVER 1 : リアルタイム処理・演算ノード"]
+        direction TB
+        N1["🌐 Nginx (S1 プロキシ)"]
+        AUTH["🔐 認証<br/>(Auth Service)"]:::s1_style
+        MATCH["🤝 マッチング<br/>(Match Service)"]:::s1_style
+        GS["🎮 ゲームセッション<br/>(WS/Engine)"]:::s1_style
+    end
+
+    %% --- 3. SERVER 2 (192.168.200.101) ---
+    subgraph S2 ["💾 SERVER 2 : バックエンド・データ要塞"]
+        direction TB
+        N2["🌐 Nginx (S2 プロキシ)"]
+        AS["📋 承認サービス<br/>(Approval Service)"]:::s2_style
+        DS["📊 データ・サービス<br/>(Data API)"]:::s2_style
+        DB[("🗄️ PostgreSQL<br/>(User/Record DB)")]:::storage
+    end
+
+    %% --- 実装に即した通信フロー (番号順) ---
+
+    %% 認証・マッチングフェーズ
+    USER -- "① ログイン・マッチング要求" --> N1
+    N1 --> AUTH
+    AUTH --> MATCH
+    
+    %% S1からS2への承認確認
+    AUTH -- "② 承認ステータス照会" --> N2
+    N2 --> AS
+
+    %% マッチング成功後の「折り返し」
+    MATCH -- "③ マッチ成功(IP/Port返却)" --> USER
+
+    %% 対戦フェーズ (USERが取得情報で再接続)
+    USER -- "④ WebSocket接続" --> N1
+    N1 --> GS
+
+    %% 管理フェーズ
+    ADMIN -- "⑤ 承認作業実行" --> N2
+    AS --- DB
+    DS --- DB
+    GS -. "将来拡張: 戦績保存" .-> DS
+
+    %% レイアウト微調整用の不可視線 (縦長を維持)
+    MATCH ~~~ AS
+```
+
 ### 📁 Directory Structure
 ```text
 distributed_game_project
@@ -135,6 +195,66 @@ The system employs a **functionally distributed architecture**, separating the "
     *   Acts as the primary entry point via Nginx (Reverse Proxy). It handles user authentication, matchmaking, and manages low-latency game sessions via WebSockets.
 *   **Server 2 (S2): Backend & Data Aggregation**
     *   Hosts the PostgreSQL database and the central Data API. It ensures data consistency by centralizing all read/write operations for user profiles and match results. It also hosts the Admin Approval UI for new registrations.
+
+## 🌐 Distributed Fighting Game: Vertical Architecture Diagram
+
+```mermaid
+flowchart TD
+    %% --- Style Definitions (Bold & Large Fonts) ---
+    classDef s1_style fill:#e6f7ff,stroke:#1890ff,stroke-width:4px,font-size:20px,font-weight:bold;
+    classDef s2_style fill:#fff1f0,stroke:#f5222d,stroke-width:4px,font-size:20px,font-weight:bold;
+    classDef storage fill:#f6ffed,stroke:#52c41a,stroke-width:4px,font-size:20px,font-weight:bold;
+    classDef client_style fill:#ffffff,stroke:#333333,stroke-width:3px,font-size:20px,font-weight:bold;
+
+    %% --- 1. Client Layer ---
+    USER["👤 General User<br/>(Browser/Client)"]:::client_style
+    ADMIN["🔑 Administrator<br/>(Admin Console)"]:::client_style
+
+    %% --- 2. SERVER 1: Frontend & Real-time Node (192.168.200.102) ---
+    subgraph S1 ["🚀 SERVER 1 : Public Gateway & Real-time Processing"]
+        direction TB
+        N1["🌐 Nginx (S1 Reverse Proxy)"]
+        AUTH["🔐 Authentication<br/>(Auth Service)"]:::s1_style
+        MATCH["🤝 Matchmaking<br/>(Match Service)"]:::s1_style
+        GS["🎮 Game Session<br/>(WebSocket Engine)"]:::s1_style
+    end
+
+    %% --- 3. SERVER 2: Backend & Data Node (192.168.200.101) ---
+    subgraph S2 ["💾 SERVER 2 : Backend Data & Admin Fortress"]
+        direction TB
+        N2["🌐 Nginx (S2 Reverse Proxy)"]
+        AS["📋 Approval Service<br/>(User Management)"]:::s2_style
+        DS["📊 Data Service<br/>(Persistence API)"]:::s2_style
+        DB[("🗄️ PostgreSQL<br/>(User & Match DB)")]:::storage
+    end
+
+    %% --- Communication Flow (Implementation Reality) ---
+
+    %% Phase 1: Authentication & Matchmaking
+    USER -- "1. Login / Matchmaking Request" --> N1
+    N1 --> AUTH
+    AUTH --> MATCH
+    
+    %% Cross-Server Communication (S1 -> S2)
+    AUTH -- "2. Verify Approval Status" --> N2
+    N2 --> AS
+
+    %% Phase 2: Match Success (Return IP/Port to Client)
+    MATCH -- "3. Return Match Result (IP/Port)" --> USER
+
+    %% Phase 3: Game Session (User connects via WebSocket)
+    USER -- "4. Establish WebSocket Connection" --> N1
+    N1 --> GS
+
+    %% Phase 4: Administrative Flow
+    ADMIN -- "5. Administrative Approval" --> N2
+    AS --- DB
+    DS --- DB
+    GS -. "Future: Persist Match Scores" .-> DS
+
+    %% Maintain Vertical Layout
+    MATCH ~~~ AS
+```
 
 ### 📁 Directory Structure
 ```text
